@@ -4,7 +4,7 @@ codeunit 60115 "MDF Dim Mandatory Mgt"
     var
         RecRef: RecordRef;
         DefaultDim: Record "Default Dimension";
-        Setup: Record "HND Tables Default Dimension";
+        Setup: Record "MDF Tables Default Dimension";
         TableID: Integer;
         NoCode: Code[20];
     begin
@@ -32,7 +32,7 @@ codeunit 60115 "MDF Dim Mandatory Mgt"
             until Setup.Next() = 0;
     end;
 
-    local procedure IsDimensionMandatoryForTable(Setup: Record "HND Tables Default Dimension"; TableID: Integer): Boolean
+    local procedure IsDimensionMandatoryForTable(Setup: Record "MDF Tables Default Dimension"; TableID: Integer): Boolean
     begin
         case TableID of
             Database::Item:
@@ -48,7 +48,7 @@ codeunit 60115 "MDF Dim Mandatory Mgt"
         exit(false);
     end;
 
-    local procedure DimensionExists(var DefaultDim: Record "Default Dimension"; TableID: Integer; NoCode: Code[20]; DimCode: Code[20]): Boolean
+    procedure DimensionExists(var DefaultDim: Record "Default Dimension"; TableID: Integer; NoCode: Code[20]; DimCode: Code[20]): Boolean
     begin
         DefaultDim.Reset();
         DefaultDim.SetRange("Table ID", TableID);
@@ -68,5 +68,14 @@ codeunit 60115 "MDF Dim Mandatory Mgt"
         end;
 
         exit('');
+    end;
+
+    procedure HasMissingMandatoryDimensions(var VariantRec: Variant): Boolean
+    var
+        TempBuffer: Record "MDF Dim Mandatory Buffer" temporary;
+    begin
+        GetMissingDimensions(TempBuffer, VariantRec);
+
+        exit(not TempBuffer.IsEmpty());
     end;
 }

@@ -1,4 +1,4 @@
-table 60110 "MDF Mandatory Fields Buffer"
+table 60103 "MDF Mandatory Fields Buffer"
 {
     DataClassification = ToBeClassified;
     Caption = 'Mandatory Fields Buffer';

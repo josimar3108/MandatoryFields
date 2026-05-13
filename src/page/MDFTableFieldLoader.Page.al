@@ -35,15 +35,36 @@ page 60112 "MDF Table Field Loader"
             {
                 Caption = 'Create Fields';
                 Image = Import;
-
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = false;
                 trigger OnAction()
                 var
                     MandatoryFieldMgt: Codeunit "MDF Utils";
                 begin
+                    EnsureTableConfig(Rec."Object ID");
                     MandatoryFieldMgt.InitializeTableFields(Rec."Object ID");
                     Message('Fields created for table %1', Rec."Object Caption");
                 end;
             }
         }
     }
+
+    local procedure EnsureTableConfig(TableNo: Integer)
+    var
+        TableCfg: Record "MDF Table Config";
+        AllObj: Record AllObjWithCaption;
+    begin
+        if not TableCfg.Get(TableNo) then begin
+            TableCfg.Init();
+            TableCfg."Table No." := TableNo;
+
+            if AllObj.Get(AllObj."Object Type"::Table, TableNo) then
+                TableCfg."Table Name" := AllObj."Object Caption";
+
+            TableCfg.Insert();
+        end;
+    end;
 }

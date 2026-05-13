@@ -1,29 +1,5 @@
 codeunit 60112 "MDF Utils"
 {
-    procedure InitializeCustomerFields()
-    var
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
-        CustomerFieldSetup: Record "MDF Mandatory Fields";
-        i: Integer;
-    begin
-        RecRef.Open(Database::Customer);
-
-        for i := 1 to RecRef.FieldCount do begin
-            FieldRef := RecRef.FieldIndex(i);
-
-            if not CustomerFieldSetup.Get(Database::Customer, FieldRef.Number) then begin
-                CustomerFieldSetup.Init();
-                CustomerFieldSetup."Table No." := Database::Customer;
-                CustomerFieldSetup."Field No." := FieldRef.Number;
-                CustomerFieldSetup."Field Name" := FieldRef.Name;
-                CustomerFieldSetup.Mandatory := false;
-                CustomerFieldSetup.Insert();
-            end;
-        end;
-
-        RecRef.Close();
-    end;
 
     procedure InitializeTableFields(TableNo: Integer)
     var
@@ -36,6 +12,9 @@ codeunit 60112 "MDF Utils"
 
         for i := 1 to RecRef.FieldCount do begin
             FieldRef := RecRef.FieldIndex(i);
+
+            if FieldRef.Class = FieldClass::FlowField then
+                continue;
 
             if not MandatorySetup.Get(TableNo, FieldRef.Number) then begin
                 MandatorySetup.Init();
@@ -114,11 +93,28 @@ codeunit 60112 "MDF Utils"
 
 
             FieldType::Boolean:
-                exit(false); // normalmente no se valida boolean
+                exit(false);
 
             else
                 exit(Format(FieldRef.Value) = '');
         end;
+    end;
+
+    local procedure IsFeatureEnabled(TableID: Integer): Boolean
+    var
+        Setup: Record "MDF Setup";
+        TableCfg: Record "MDF Table Config";
+    begin
+        if not Setup.Get('SETUP') then
+            exit(false);
+
+        if not Setup."Enable Mandatory Fields" then
+            exit(false);
+
+        if not TableCfg.Get(TableID) then
+            exit(false);
+
+        exit(TableCfg."Enable Mandatory Fields");
     end;
 
     procedure ValidateMandatoryCustomerFields(Customer: Record Customer)
@@ -224,4 +220,101 @@ codeunit 60112 "MDF Utils"
                 exit(false);
         end;
     end;
+
+    procedure IsBlockManaged(TableID: Integer): Boolean
+    var
+        MDFTableConfig: Record "MDF Table Config";
+    begin
+        if not MDFTableConfig.Get(TableID) then
+            exit(false);
+
+        exit(MDFTableConfig."Block On Validation");
+    end;
+
+    #region Item - Customer - Vendor Validations
+
+    procedure ValidateAndApplyBlocking(VariantRec: Variant)
+    var
+        MDFDimMandatoryMgt: Codeunit "MDF Dim Mandatory Mgt";
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(VariantRec);
+
+        if ValidateMandatoryFields(VariantRec)
+        or MDFDimMandatoryMgt.HasMissingMandatoryDimensions(VariantRec)
+        then
+            ApplyBlockedState(RecRef, true)
+        else
+            ApplyBlockedState(RecRef, false);
+    end;
+
+    local procedure ApplyBlockedState(var RecRef: RecordRef; IsBlocked: Boolean)
+    var
+        Item: Record Item;
+        Customer: Record Customer;
+        Vendor: Record Vendor;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+
+        OnBeforeApplyBlockedState(RecRef, IsBlocked, IsHandled);
+
+        if IsHandled then
+            exit;
+
+        case RecRef.Number of
+            Database::Item:
+                begin
+                    RecRef.SetTable(Item);
+
+                    Item.Blocked := IsBlocked;
+                    Item."Sales Blocked" := IsBlocked;
+                    Item."Purchasing Blocked" := IsBlocked;
+
+                    Item.Modify();
+                end;
+
+            Database::Customer:
+                begin
+                    RecRef.SetTable(Customer);
+
+                    if IsBlocked then
+                        Customer.Blocked := Customer.Blocked::All
+                    else
+                        Customer.Blocked := Customer.Blocked::" ";
+
+                    Customer.Modify();
+                end;
+
+            Database::Vendor:
+                begin
+                    RecRef.SetTable(Vendor);
+
+                    if IsBlocked then
+                        Vendor.Blocked := Vendor.Blocked::All
+                    else
+                        Vendor.Blocked := Vendor.Blocked::" ";
+
+                    Vendor.Modify();
+                end;
+        end;
+
+        OnAfterApplyBlockedState(RecRef, IsBlocked)
+    end;
+
+    #endregion Item - Customer - Vendor Validations
+
+    #region IntegrationEvents
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeApplyBlockedState(var RecRef: RecordRef; IsBlocked: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterApplyBlockedState(var RecRef: RecordRef; IsBlocked: Boolean)
+    begin
+    end;
+
+    #endregion IntegrationEvents
 }

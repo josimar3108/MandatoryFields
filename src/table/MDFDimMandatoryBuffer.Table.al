@@ -1,4 +1,4 @@
-table 60111 "MDF Dim Mandatory Buffer"
+table 60101 "MDF Dim Mandatory Buffer"
 {
     DataClassification = ToBeClassified;
 

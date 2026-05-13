@@ -1,23 +1,23 @@
 {
   "id": "cb87dff1-eda2-4b0e-9535-c9e92a416174",
   "name": "MandatoryFields",
-  "publisher": "Default Publisher",
+  "publisher": "Optimus Business Transformation",
   "version": "1.0.0.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
-  "EULA": "",
-  "help": "",
-  "url": "",
-  "logo": "",
+  "EULA": "https://www.optimus.pro/",
+  "help": "https://www.optimus.pro/",
+  "url": "https://www.optimus.pro/",
+  "logo": "./logo/logo.jpg",
   "dependencies": [],
   "screenshots": [],
   "platform": "1.0.0.0",
   "application": "27.0.0.0",
   "idRanges": [
     {
-      "from": 50100,
-      "to": 50149
+      "from": 60100,
+      "to": 60149
     }
   ],
   "resourceExposurePolicy": {

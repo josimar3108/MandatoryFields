@@ -5,6 +5,8 @@ page 60108 "MDF Mandatory Fields List"
     PageType = List;
     SourceTable = "MDF Mandatory Fields";
     UsageCategory = Administration;
+    InsertAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -31,30 +33,6 @@ page 60108 "MDF Mandatory Fields List"
                 {
                     ToolTip = 'Specifies the value of the Mandatory field.', Comment = '%';
                 }
-            }
-        }
-    }
-    actions
-    {
-        area(Processing)
-        {
-            action(LoadCustomerFields)
-            {
-                Caption = 'Load Customer Fields';
-                Image = Import;
-                ApplicationArea = All;
-
-                trigger OnAction()
-                var
-                    MDFUtils: Codeunit "MDF Utils";
-                    RecVariant: Variant;
-                begin
-                    MDFUtils.InitializeCustomerFields();
-                    Message('Customer fields have been loaded successfully.');
-                    CurrPage.Update();
-                    RecVariant := Rec;
-                    MDFUtils.ValidateMandatoryFields(RecVariant);
-                end;
             }
         }
     }

@@ -5,14 +5,16 @@
             "name": "Microsoft cloud sandbox",
             "request": "launch",
             "type": "al",
-            "environmentType": "Sandbox",
-            "environmentName": "sandbox",
-            "startupObjectId": 22,
+            "environmentType": "Production",
+            "environmentName": "INTERNAL_DEMO",
+            "serverInstance": "https://businesscentral.dynamics.com/0fc9365f-72f1-4dcf-bfb2-b2d34736b8b4/INTERNAL_DEMO",
+            "startupObjectId": 60101,
             "startupObjectType": "Page",
             "breakOnError": "All",
             "launchBrowser": true,
             "enableLongRunningSqlStatements": true,
-            "enableSqlInformationDebugger": true
+            "enableSqlInformationDebugger": true,
+            "schemaUpdateMode": "ForceSync"
         }
     ]
 }

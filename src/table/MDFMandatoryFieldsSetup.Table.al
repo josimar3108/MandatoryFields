@@ -1,6 +1,6 @@
-table 60109 "MDF Mandatory Fields Setup"
+table 60104 "MDF Setup"
 {
-    Caption = 'MDF Mandatory Fields Setup';
+    Caption = 'Mandatory Fields Setup';
     DataClassification = CustomerContent;
 
     fields
@@ -10,19 +10,24 @@ table 60109 "MDF Mandatory Fields Setup"
             Caption = 'Primary Key';
         }
 
-        field(2; "Enable Customer Validation"; Boolean)
+        field(2; "Enable Mandatory Fields"; Boolean)
         {
-            Caption = 'Enable Customer Validation';
+            Caption = 'Enable Mandatory Fields';
         }
 
-        field(3; "Enable Vendor Validation"; Boolean)
+        field(3; "Enable FactBoxes"; Boolean)
         {
-            Caption = 'Enable Vendor Validation';
+            Caption = 'Enable FactBoxes';
         }
 
-        field(4; "Enable Item Validation"; Boolean)
+        field(4; "Block On Validation"; Boolean)
         {
-            Caption = 'Enable Item Validation';
+            Caption = 'Block On Validation';
+        }
+
+        field(5; "Enable Dimensions Control"; Boolean)
+        {
+            Caption = 'Enable Dimensions Control';
         }
     }
 

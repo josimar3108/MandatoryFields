@@ -1,4 +1,4 @@
-table 60108 "MDF Mandatory Fields"
+table 60102 "MDF Mandatory Fields"
 {
     Caption = 'Mandatory Fields';
     DataClassification = CustomerContent;
