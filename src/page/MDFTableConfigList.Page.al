@@ -68,7 +68,7 @@ page 60101 "MDF Table Config List"
                 trigger OnAction()
                 var
                     MandatorySetup: Record "MDF Mandatory Fields";
-                    MDFUtils: Codeunit "MDF Utils";
+                    MDFMandatoryFieldMgt: Codeunit "MDF Mandatory Field Mgt";
                 begin
                     if not Confirm('Esto eliminará la configuración existente. ¿Continuar?', false) then
                         exit;
@@ -76,7 +76,7 @@ page 60101 "MDF Table Config List"
                     MandatorySetup.SetRange("Table No.", Rec."Table No.");
                     MandatorySetup.DeleteAll();
 
-                    MDFUtils.InitializeTableFields(Rec."Table No.");
+                    MDFMandatoryFieldMgt.InitializeTableFields(Rec."Table No.");
 
                     Message('Campos reiniciados.');
                 end;

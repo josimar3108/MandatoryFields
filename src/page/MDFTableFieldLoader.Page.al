@@ -42,10 +42,10 @@ page 60112 "MDF Table Field Loader"
                 PromotedOnly = false;
                 trigger OnAction()
                 var
-                    MandatoryFieldMgt: Codeunit "MDF Utils";
+                    MDFMandatoryFieldMgt: Codeunit "MDF Mandatory Field Mgt";
                 begin
                     EnsureTableConfig(Rec."Object ID");
-                    MandatoryFieldMgt.InitializeTableFields(Rec."Object ID");
+                    MDFMandatoryFieldMgt.InitializeTableFields(Rec."Object ID");
                     Message('Fields created for table %1', Rec."Object Caption");
                 end;
             }

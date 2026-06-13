@@ -25,6 +25,29 @@ pageextension 60146 "MDF Item Card" extends "Item Card"
     {
         addlast(Processing)
         {
+            action(MDFBlockItem)
+            {
+                ApplicationArea = All;
+                Caption = 'Block by Data Quality';
+                Image = Lock;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                Visible = IsBlockManaged;
+                Enabled = not Rec.Blocked;
+
+                trigger OnAction()
+                var
+                    MDFFeatureManagement: Codeunit "MDF Feature Management";
+                begin
+                    if MDFFeatureManagement.IsBlockManaged(Database::Item) then begin
+                        Rec.Blocked := true;
+                        Rec.Modify();
+                    end;
+
+                    CurrPage.Update(false);
+                end;
+            }
             action(MDFUnlockItem)
             {
                 ApplicationArea = All;
@@ -38,10 +61,18 @@ pageextension 60146 "MDF Item Card" extends "Item Card"
 
                 trigger OnAction()
                 var
-                    MDFUtils: Codeunit "MDF Utils";
+                    MDFFeatureManagement: Codeunit "MDF Feature Management";
+                    MDFValidationMgt: Codeunit "MDF Validation Mgt";
                 begin
-                    if MDFUtils.IsBlockManaged(Database::Item) then
-                        MDFUtils.ValidateAndApplyBlocking(Rec);
+                    if not MDFFeatureManagement.IsBlockManaged(Database::Item) then
+                        exit;
+
+                    if MDFValidationMgt.ValidateRecord(Rec) then begin
+                        MDFValidationMgt.ShowValidationIssues(Rec);
+                        exit;
+                    end;
+
+                    MDFValidationMgt.ValidateAndApplyBlocking(Rec);
 
                     CurrPage.Update(false);
                 end;
@@ -52,6 +83,17 @@ pageextension 60146 "MDF Item Card" extends "Item Card"
         IsBlockManaged: Boolean;
         CanEditBlockedField: Boolean;
 
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        MDFFeatureManagement: Codeunit "MDF Feature Management";
+        MDFValidationMgt: Codeunit "MDF Validation Mgt";
+    begin
+        if (Rec."No." <> '') and (MDFFeatureManagement.IsBlockManaged(Database::Item)) then begin
+            MDFValidationMgt.ValidateAndApplyBlocking(Rec);
+            Commit();
+        end;
+    end;
+
     trigger OnModifyRecord(): Boolean
     begin
         if (Rec."No." <> '') and (Rec.SystemCreatedAt <> 0DT) then
@@ -60,9 +102,9 @@ pageextension 60146 "MDF Item Card" extends "Item Card"
 
     trigger OnAfterGetRecord()
     var
-        MDFUtils: Codeunit "MDF Utils";
+        MDFFeatureManagement: Codeunit "MDF Feature Management";
     begin
-        IsBlockManaged := MDFUtils.IsBlockManaged(Database::Item);
+        IsBlockManaged := MDFFeatureManagement.IsBlockManaged(Database::Item);
         CanEditBlockedField := not IsBlockManaged;
 
         CurrPage.MandatoryFields.Page.LoadData(Rec);

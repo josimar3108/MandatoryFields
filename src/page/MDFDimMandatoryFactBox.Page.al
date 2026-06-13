@@ -12,6 +12,7 @@ page 60117 "MDF Dim Mandatory FactBox"
             {
                 field(StatusTxt; StatusTxt)
                 {
+                    Caption = 'Dim. restantes';
                     ApplicationArea = All;
                     Editable = false;
                     StyleExpr = StyleTxt;
@@ -38,10 +39,10 @@ page 60117 "MDF Dim Mandatory FactBox"
         DimMgt.GetMissingDimensions(Rec, VariantRec);
 
         if Rec.Count = 0 then begin
-            StatusTxt := '✓ Dimensiones completas';
+            StatusTxt := '✓ OK';
             StyleTxt := 'Favorable';
         end else begin
-            StatusTxt := '⚠ ' + Format(Rec.Count) + ' dimensiones faltantes';
+            StatusTxt := '⚠ ' + Format(Rec.Count) + ' missing dimension(s)';
             StyleTxt := 'Attention';
         end;
 
